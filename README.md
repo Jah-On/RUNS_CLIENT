@@ -6,7 +6,7 @@ GUI companion app for the RUNS robot platform.
 
 - Clone the repo: `git clone https://github.com/Jah-On/RUNS_CLIENT`
 - Change directory: `cd RUNS_CLIENT`
-- Fetch submodules: `git submodule init`
+- Fetch submodules: `git submodule update --init --recursive`
 - Run CMake: `cmake .`
 - Build: `make`
 
