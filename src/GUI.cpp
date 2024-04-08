@@ -274,15 +274,18 @@ void GUI::run(){
                 [this](){
                     if (this->robot->isConnected()){
                         this->UI_State = CONNECTED;
-                    } else if (RUNS::Robot::bluetoothEnabled()){
-                        this->UI_State = NOT_CONNECTED;
+                    } else if (!RUNS::Robot::bluetoothEnabled()){
+                        this->UI_State = BT_OFF;
                     }
                 }
             );
             break;
         default:
-            if (!RUNS::Robot::bluetoothEnabled()){
-                UI_State = BT_OFF;
+            if (!this->robot->isConnected()){
+                this->UI_State = NOT_CONNECTED;
+                break;
+            } else if (!RUNS::Robot::bluetoothEnabled()){
+                this->UI_State = BT_OFF;
                 break;
             }
             drawBumpers();
