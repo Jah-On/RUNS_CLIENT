@@ -22,7 +22,7 @@ namespace RUNS {
 // Service UUIDs
 const std::string GENERIC_ACCESS      = "00001800-0000-1000-8000-00805f9b34fb";
 const std::string GENERIC_ATTRIBUTE   = "00001801-0000-1000-8000-00805f9b34fb";
-const std::string DEVICE_INFO         = "0000180A-0000-1000-8000-00805f9b34fb";
+const std::string DEVICE_INFO         = "0000180a-0000-1000-8000-00805f9b34fb";
 
 // RUNS Specific
 const std::string TEMPERATURE_SERVICE = "0000a000-0000-1000-8000-00805f9b34fb";
@@ -87,6 +87,7 @@ public:
     void        setVelocity(int8_t);
     void        setRotation(Rotation);
     int8_t      getVelocity();
+    Rotation    getRotation();
     int8_t      getMicroprocessorTemp();
     int8_t      getEnvironmentTemp();
     int8_t      getBumpers();

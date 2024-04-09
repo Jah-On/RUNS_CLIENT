@@ -84,20 +84,26 @@ void RUNS::Robot::timedQueueAdder(Command command, int16_t msInterval){
 }
 
 void RUNS::Robot::connected(){
-    Command            command;
-    precise_time_point current_time;
+    char                data[2]     = {0, 0};
+    Command             command;
+    precise_time_point  current_time;
     while (this->run){
         if (!this->bt_handle->is_connected()){
             this->bt_handle.reset();
             this->notConnected();
         }
         current_time = std::chrono::system_clock::now();
-        if ((bumper_timer - current_time) > MS_20){
+        if ((current_time - bumper_timer) > MS_20){
             this->queue.push_back({OP_PROX_BUMPERS, 0});
-        } else if ((mcu_timer - current_time) > MS_50){
+            bumper_timer = current_time;
+        }
+        if ((current_time - mcu_timer) > MS_50){
             this->queue.push_back({OP_TEMP_MICROPROCESSOR, 0});
-        } else if ((mcu_timer - current_time) > MS_100){
+            mcu_timer = current_time;
+        }
+        if ((current_time - ambient_timer) > MS_100){
             this->queue.push_back({OP_TEMP_ENVIRONMENT, 0});
+            ambient_timer = current_time;
         }
         if (!this->queue.size()){
             std::this_thread::sleep_for(
@@ -127,17 +133,25 @@ void RUNS::Robot::connected(){
             if (bumpers){ speed = 0; }
             break;
         case OP_MOVE_VELOCITY:
-            bt_handle->write_command(
+            data[0] = command.value;
+            bt_handle->write_request(
                 MOVEMENT_SERVICE,
                 MOVE_VELOCITY, 
-                std::to_string(command.value)
+                SimpleBLE::ByteArray(
+                    (const char*)data,
+                    2
+                )
             );
             break;
         case OP_MOVE_ROTATION:
-            bt_handle->write_command(
+            data[0] = command.value;
+            bt_handle->write_request(
                 MOVEMENT_SERVICE,
                 MOVE_ROTATION,
-                std::to_string(command.value)
+                SimpleBLE::ByteArray(
+                    (const char*)data,
+                    2
+                )
             );
             break;
         default:
@@ -157,10 +171,14 @@ void RUNS::Robot::setVelocity(int8_t speed){
     
     if ((speed > 0) && bumpers)   { return; }
     if (speed == this->speed)     { return; }
-    if (speed_timer - now < MS_20){ return; }
+    if (now - speed_timer < MS_20){ return; }
 
     this->speed = speed;
-    this->queue.push_front({OP_MOVE_VELOCITY, speed});
+    if (speed){
+        this->queue.push_back({OP_MOVE_VELOCITY, speed});
+    } else {
+        this->queue.push_front({OP_MOVE_VELOCITY, speed});
+    }
 
     this->speed_timer = now;
 }
@@ -169,14 +187,19 @@ void RUNS::Robot::setRotation(Rotation dir){
     precise_time_point now = std::chrono::system_clock::now();
 
     if (dir == this->rotation)       { return; }
-    if (rotation_timer - now < MS_20){ return; }
+    if (now - rotation_timer < MS_20){ return; }
 
+    this->rotation = dir;
     this->queue.push_front({OP_MOVE_ROTATION, dir});
     this->rotation_timer = now;
 }
 
 int8_t RUNS::Robot::getVelocity(){
     return this->speed;
+}
+
+RUNS::Rotation RUNS::Robot::getRotation(){
+    return this->rotation;
 }
 
 int8_t RUNS::Robot::getMicroprocessorTemp(){

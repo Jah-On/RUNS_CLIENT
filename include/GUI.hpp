@@ -44,6 +44,7 @@ private:
     int                        bumper_y;
     int                        temps_y;
     int                        speed_slider_value;
+    RUNS::Rotation             gui_rotation_value;
     precise_clock::time_point  timer;
     enum {
         BT_OFF, NOT_CONNECTED, CONNECTED

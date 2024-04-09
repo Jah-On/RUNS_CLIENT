@@ -214,16 +214,18 @@ void GUI::updateRobotFromUI(){
         speed_slider_value--;
     }
 
-    if (ImGui::IsKeyDown(ImGuiKey_Space)) {
-        speed_slider_value = 0;
-    }
+    speed_slider_value = !ImGui::IsKeyDown(ImGuiKey_Space);
 
     if (ImGui::IsKeyDown(ImGuiKey_A) && !ImGui::IsKeyDown(ImGuiKey_D)){
-        robot->setRotation(RUNS::Rotation::LEFT);
+        gui_rotation_value = RUNS::Rotation::LEFT;
     } else if (ImGui::IsKeyDown(ImGuiKey_D) && !ImGui::IsKeyDown(ImGuiKey_A)){
-        robot->setRotation(RUNS::Rotation::RIGHT);
+        gui_rotation_value = RUNS::Rotation::RIGHT;
     } else {
-        robot->setRotation(RUNS::Rotation::NONE);
+        gui_rotation_value = RUNS::Rotation::NONE;
+    }
+    
+    if (gui_rotation_value != robot->getRotation()){
+        robot->setRotation(gui_rotation_value);
     }
 
     if (speed_slider_value != robot->getVelocity()){
