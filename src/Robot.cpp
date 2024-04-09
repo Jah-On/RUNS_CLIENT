@@ -19,7 +19,6 @@ RUNS::Robot::Robot(){
 }
 
 RUNS::Robot::~Robot(){
-    run                 = false;
     speed               = 0;
     rotation            = NONE;
     bumpers             = 0;
@@ -212,6 +211,10 @@ int8_t RUNS::Robot::getEnvironmentTemp(){
 
 int8_t RUNS::Robot::getBumpers(){
     return this->bumpers;
+}
+
+void RUNS::Robot::exit(){
+    this->run = false;
 }
 
 #endif

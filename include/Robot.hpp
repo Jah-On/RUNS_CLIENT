@@ -91,5 +91,6 @@ public:
     int8_t      getMicroprocessorTemp();
     int8_t      getEnvironmentTemp();
     int8_t      getBumpers();
+    void        exit();
 };
 }

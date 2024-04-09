@@ -260,7 +260,7 @@ void GUI::run(){
         switch (UI_State){
         case (BT_OFF):
             drawError(
-                "Bluetooth off, please turn back on", 
+                "Bluetooth Off...",
                 "", 
                 [this](){
                     if (RUNS::Robot::bluetoothEnabled()){
@@ -314,7 +314,6 @@ void GUI::run(){
 }
 
 void GUI::exit(){
-    delete robot;
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
