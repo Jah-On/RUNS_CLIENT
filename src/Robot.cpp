@@ -39,14 +39,27 @@ void RUNS::Robot::bluetoothOff(){
 }
 
 void RUNS::Robot::notConnected(){
-    bool               match;
-    SimpleBLE::Adapter adapter;
+    bool                     match;
+    Adapters                 adapters;
+    Peripherals              peripherals;
     while (this->run){
+        std::this_thread::sleep_for(
+            std::chrono::milliseconds(100)
+        );
         if (!SimpleBLE::Adapter::bluetooth_enabled()){
             this->bluetoothOff();
         }
-        adapter = SimpleBLE::Adapter::get_adapters()[0];
-        for (SimpleBLE::Peripheral peer : adapter.get_paired_peripherals()){
+        adapters = SimpleBLE::Safe::Adapter::get_adapters();
+        if (!adapters.has_value()){
+            printf("Failed to get adapters!");
+            continue;
+        }
+        peripherals = adapters.value()[0].get_paired_peripherals();
+        if (!peripherals.has_value()){
+            printf("Failed to get peripherals!");
+            continue;
+        }
+        for (SimpleBLE::Peripheral peer : peripherals.value()){
             if (!peer.is_connected()){ continue; }
             match = true;
             for (SimpleBLE::Service serv : peer.services()){
@@ -67,9 +80,6 @@ void RUNS::Robot::notConnected(){
                 this->connected();
             }
         }
-        std::this_thread::sleep_for(
-            std::chrono::milliseconds(100)
-        );
     }
 }
 
@@ -83,11 +93,12 @@ void RUNS::Robot::timedQueueAdder(Command command, int16_t msInterval){
 }
 
 void RUNS::Robot::connected(){
-    char                data[2]     = {0, 0};
-    Command             command;
-    precise_time_point  current_time;
+    char                                data[2]     = {0, 0};
+    std::optional<SimpleBLE::ByteArray> res;
+    Command                             command;
+    precise_time_point                  current_time;
     while (this->run){
-        if (!this->bt_handle->is_connected()){
+        if (!this->bt_handle->is_connected().value()){
             this->bt_handle.reset();
             this->notConnected();
         }
@@ -113,22 +124,34 @@ void RUNS::Robot::connected(){
         command = this->queue.front();
         switch (command.op){
         case OP_TEMP_MICROPROCESSOR:
-            this->microprocessor_temp = bt_handle->read(
+            res = bt_handle->read(
                 TEMPERATURE_SERVICE,
                 TEMP_MICROPROCESSOR
-            ).at(0);
+            );
+            if (!res.has_value()){
+                break;
+            }
+            this->microprocessor_temp = res.value().at(0);
             break;
         case OP_TEMP_ENVIRONMENT:
-            this->environment_temp = bt_handle->read(
+            res = bt_handle->read(
                 TEMPERATURE_SERVICE,
                 TEMP_ENVIRONMENT
-            ).at(0);
+            );
+            if (!res.has_value()){
+                break;
+            }
+            this->environment_temp = res.value().at(0);
             break;
         case OP_PROX_BUMPERS:
-            this->bumpers = bt_handle->read(
+            res = bt_handle->read(
                 PROXIMITY_SERVICE,
                 PROX_BUMPERS
-            ).at(0);
+            );
+            if (!res.has_value()){
+                break;
+            }
+            this->bumpers = res.value().at(0);
             if (bumpers){ speed = 0; }
             break;
         case OP_MOVE_VELOCITY:
@@ -173,11 +196,12 @@ void RUNS::Robot::setVelocity(int8_t speed){
     if (now - speed_timer < MS_20){ return; }
 
     this->speed = speed;
-    if (speed){
-        this->queue.push_back({OP_MOVE_VELOCITY, speed});
-    } else {
-        this->queue.push_front({OP_MOVE_VELOCITY, speed});
-    }
+    // if (speed){
+    //     this->queue.push_back({OP_MOVE_VELOCITY, speed});
+    // } else {
+    //     this->queue.push_front({OP_MOVE_VELOCITY, speed});
+    // }
+    this->queue.push_front({OP_MOVE_VELOCITY, speed});
 
     this->speed_timer = now;
 }
@@ -218,3 +242,4 @@ void RUNS::Robot::exit(){
 }
 
 #endif
+

@@ -214,7 +214,7 @@ void GUI::updateRobotFromUI(){
         speed_slider_value--;
     }
 
-    speed_slider_value = !ImGui::IsKeyDown(ImGuiKey_Space);
+    speed_slider_value *= !ImGui::IsKeyDown(ImGuiKey_Space);
 
     if (ImGui::IsKeyDown(ImGuiKey_A) && !ImGui::IsKeyDown(ImGuiKey_D)){
         gui_rotation_value = RUNS::Rotation::LEFT;
@@ -284,6 +284,8 @@ void GUI::run(){
             break;
         default:
             if (!this->robot->isConnected()){
+                this->speed_slider_value = 0;
+                this->gui_rotation_value = RUNS::Rotation::NONE;
                 this->UI_State = NOT_CONNECTED;
                 break;
             } else if (!RUNS::Robot::bluetoothEnabled()){

@@ -11,7 +11,9 @@
 #include <thread>
 #include <list>
 
-typedef std::chrono::high_resolution_clock::time_point precise_time_point;
+typedef std::chrono::high_resolution_clock::time_point          precise_time_point;
+typedef std::optional<std::vector<SimpleBLE::Safe::Adapter>>    Adapters;
+typedef std::optional<std::vector<SimpleBLE::Safe::Peripheral>> Peripherals;
 
 const std::chrono::duration MS_20{std::chrono::milliseconds(20)};
 const std::chrono::duration MS_50{std::chrono::milliseconds(50)};
@@ -61,19 +63,19 @@ typedef struct Command {
 
 class Robot {
 private:
-    bool                                 run                 = true;
-    std::optional<SimpleBLE::Peripheral> bt_handle           = std::nullopt;
-    int8_t                               microprocessor_temp = 0;
-    int8_t                               environment_temp    = 0;
-    int8_t                               bumpers             = 0;
-    int8_t                               speed               = 0;
-    Rotation                             rotation            = NONE;
-    precise_time_point                   mcu_timer           = std::chrono::system_clock::now();
-    precise_time_point                   ambient_timer       = std::chrono::system_clock::now();
-    precise_time_point                   bumper_timer        = std::chrono::system_clock::now();
-    precise_time_point                   speed_timer         = std::chrono::system_clock::now();
-    precise_time_point                   rotation_timer      = std::chrono::system_clock::now();
-    std::list<Command>                   queue               = {};
+    bool                                       run                 = true;
+    std::optional<SimpleBLE::Safe::Peripheral> bt_handle           = std::nullopt;
+    int8_t                                     environment_temp    = 0;
+    int8_t                                     microprocessor_temp = 0;
+    int8_t                                     bumpers             = 0;
+    int8_t                                     speed               = 0;
+    Rotation                                   rotation            = NONE;
+    precise_time_point                         mcu_timer           = std::chrono::system_clock::now();
+    precise_time_point                         ambient_timer       = std::chrono::system_clock::now();
+    precise_time_point                         bumper_timer        = std::chrono::system_clock::now();
+    precise_time_point                         speed_timer         = std::chrono::system_clock::now();
+    precise_time_point                         rotation_timer      = std::chrono::system_clock::now();
+    std::list<Command>                         queue               = {};
 
     void timedQueueAdder(Command, int16_t);
     void bluetoothOff();
