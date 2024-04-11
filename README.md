@@ -2,7 +2,7 @@
 
 GUI companion app for the RUNS robot platform.
 
-[Firmware repository]([https://github.com/Jah-On/RUNS_FIRMWARE).
+[Firmware repository](https://github.com/Jah-On/RUNS_FIRMWARE).
 
 ![image](https://github.com/Jah-On/RUNS_CLIENT/assets/58399643/dbf004c2-17c2-4c75-93bb-4219f0821241)
 
