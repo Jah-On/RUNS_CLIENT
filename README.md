@@ -6,7 +6,7 @@ GUI companion app for the RUNS robot platform.
 
 ![image](https://github.com/Jah-On/RUNS_CLIENT/assets/58399643/dbf004c2-17c2-4c75-93bb-4219f0821241)
 
-<!-- TODO: Add screenshot and maybe demo video -->
+[Demonstration Video](https://www.youtube.com/watch?v=OKWn881LOjM).
 
 ## Build steps
 
